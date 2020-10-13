@@ -5,9 +5,9 @@ After=network.target
 [Service]
 User=root
 Group=www-data
-WorkingDirectory=/var/www/CardGame/CardGamePage
-Environment="PATH=/var/www/CardGame/CardGameEnv/bin"
-ExecStart=/var/www/CardGame/CardGameEnv/bin/uwsgi --ini CardGame.ini
+WorkingDirectory=/var/www/andrewbounds/CardGamePage
+Environment="PATH=/var/www/andrewbounds/AndrewBoundsEnv/bin"
+ExecStart=/var/www/andrewbounds/AndrewBoundsEnv/bin/uwsgi --ini CardGame.ini
 
 [Install]
 WantedBy=multi-user.target
