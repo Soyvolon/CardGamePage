@@ -47,6 +47,10 @@ def display_page(pathname):
 
 # END Callbacks ----------------------
 # API Routing ------------------------
+@server.route('/api/v1/game/current', methods=["GET"])
+def get_current_game_respond():
+    return Response(200)
+
 @server.route('/api/v1/testauth', methods=["POST"])
 def testauth_respond():
     try:
@@ -62,8 +66,10 @@ def guess_respond():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
-            du.save_new_guesses(json)
-            return Response(status=200)
+            if du.save_new_guesses(json, guessdata, groupdata):
+                return Response(status=200)
+            else:
+                return Response(status=400)
         else:
             return Response(status=401)
     except Exception:
@@ -74,8 +80,10 @@ def victory_respond():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
-            du.update_victory(json)
-            return Response(status=200)
+            if du.update_victory(json, guessdata, groupdata):
+                return Response(status=200)
+            else:
+                return Response(status=400)
         else:
             return Response(status=401)
     except Exception:

@@ -1,9 +1,10 @@
 class CardGameGrouping(object):
-    def __init__(self, startDate = "", endDate = "", totalDays = 0, 
+    def __init__(self, gameId = 0, startDate = "", endDate = "", totalDays = 0, 
         uniqueAttempts = 0, totalAttempts = 0, repeatedGuesses = 0, 
         winner = 0, 
         firstGuess = False, twoRow = False, threeRow = False, 
         fourRow = False, lastCard = False, cardCounts = [0]):
+        self.game_id = gameId
         self.start_date = startDate
         self.end_date = endDate
         self.total_days = totalDays
