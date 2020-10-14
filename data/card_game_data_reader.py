@@ -1,8 +1,27 @@
 import csv
+import os
 from .card_game_grouping import CardGameGrouping
 from .card_guess import CardGuess
 
 class CardGameDataReader(object):
+    @staticmethod
+    def GetGroupData():
+        r = CardGameDataReader(
+            os.path.join(os.path.dirname(__file__), "data-files\\GroupData.csv"),
+            "group"
+        )
+
+        return r.read_data()
+
+    @staticmethod
+    def GetGuessData():
+        r = CardGameDataReader(
+            os.path.join(os.path.dirname(__file__), "data-files\\GuessData.csv"),
+            "guess"
+        )
+
+        return r.read_data()
+
     def __init__(self, fileName = "", fileType = ""):
         self.fileName = fileName
         self.fileType = fileType
@@ -10,7 +29,7 @@ class CardGameDataReader(object):
     def read_data(self):
         if(self.fileType == "group"):
             return self.__read_group_data()
-        elif(self.fileType == "tree"):
+        elif(self.fileType == "guess"):
             return self.__read_tree_data()
 
     def __read_group_data(self):
@@ -61,14 +80,15 @@ class CardGameDataReader(object):
     def __read_tree_data(self):
         data = []
         with open(self.fileName, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=",", quotechar='')
+            reader = csv.reader(csvfile, delimiter=",", quotechar='|')
 
             row_num = 0
             game_num = 0
 
             for row in reader:
-                if(row_num == 0):
-                    # we dont need the line, its label line.
+                if(row_num <= 1):
+                    # we dont need these line,
+                    # they are label lines.
                     row_num += 1
                     continue
                 
