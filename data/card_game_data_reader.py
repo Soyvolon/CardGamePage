@@ -7,7 +7,7 @@ class CardGameDataReader(object):
     @staticmethod
     def GetGroupData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files\\GroupData.csv"),
+            os.path.join(os.path.dirname(__file__), "data-files", "GroupData.csv"),
             "group"
         )
 
@@ -16,7 +16,7 @@ class CardGameDataReader(object):
     @staticmethod
     def GetGuessData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files\\GuessData.csv"),
+            os.path.join(os.path.dirname(__file__), "data-files", "GuessData.csv"),
             "guess"
         )
 
