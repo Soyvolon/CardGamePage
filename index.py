@@ -10,6 +10,10 @@ from pages.card_guess_data_page import GuessData
 from pages.shared.layout import Layout
 from pages.card_game_details import Details
 
+from flask import request, Response
+from api.auth import AuthroizedUsers
+from data import data_updater as du
+
 from data.card_game_data_reader import CardGameDataReader as DataReader
 
 # END IMPORTS ----------------------------
@@ -27,6 +31,8 @@ app.layout = html.Div([
 
 server = app.server
 
+# Callbacks --------------------------
+
 @app.callback(Output('page-content', 'children'),
             [Input('url', 'pathname')])
 def display_page(pathname):
@@ -39,5 +45,43 @@ def display_page(pathname):
     else:
         return Homepage(guessdata)
 
+# END Callbacks ----------------------
+# API Routing ------------------------
+@server.route('/api/v1/testauth', methods=["POST"])
+def testauth_respond():
+    try:
+        if(request.headers['Authorization'] in AuthroizedUsers()):
+            return Response(status=200)
+        else:
+            return Response(status=401)
+    except Exception:
+        return Response(status=400)
+
+@server.route('/api/v1/game/guess', methods=["POST"])
+def guess_respond():
+    try:
+        if(request.headers['Authorization'] in AuthroizedUsers()):
+            json = request.json
+            du.save_new_guesses(json)
+            return Response(status=200)
+        else:
+            return Response(status=401)
+    except Exception:
+        return Response(status=400)
+
+@server.route("/api/v1/game/victory", methods=["POST"])
+def victory_respond():
+    try:
+        if(request.headers['Authorization'] in AuthroizedUsers()):
+            json = request.json
+            du.update_victory(json)
+            return Response(status=200)
+        else:
+            return Response(status=401)
+    except Exception:
+        return Response(status=400)
+
+# END API Routing --------------------
+
 if __name__ == "__main__":
-    app.run_server(host='0.0.0.0', debug=True)
+    app.run_server(host='0.0.0.0', port='8050', debug=True)

@@ -5,9 +5,13 @@ from .card_guess import CardGuess
 
 class CardGameDataReader(object):
     @staticmethod
+    def GetDataPathFileByName(fileName):
+        return os.path.join(os.path.dirname(__file__), "data-files", fileName)
+
+    @staticmethod
     def GetGroupData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files", "GroupData.csv"),
+            CardGameDataReader.GetDataPathFileByName("GroupData.csv"),
             "group"
         )
 
@@ -16,7 +20,7 @@ class CardGameDataReader(object):
     @staticmethod
     def GetGuessData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files", "GuessData.csv"),
+            CardGameDataReader.GetDataPathFileByName("GuessData.csv"),
             "guess"
         )
 
