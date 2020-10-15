@@ -66,6 +66,9 @@ Supporting statistics from the legendary Card Game!
             ]), style={'margin': 5})
         ])
         # END Current Game
+        # START Last Game
+        
+        # END Last Game
     ],
     className="mt-4",
     )
