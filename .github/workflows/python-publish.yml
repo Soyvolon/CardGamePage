@@ -39,6 +39,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         target: var/www/andrewgounds/
         source: CardGamePage/*
+        passphrase: $ {{ secrest.SSH_KEY_PASS }}
     - name: SSH Remote Commands
       # You may pin to the exact commit or the version.
       # uses: appleboy/ssh-action@bf84735fa9986d048980965656d55112e863f432
