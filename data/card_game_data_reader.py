@@ -5,9 +5,13 @@ from .card_guess import CardGuess
 
 class CardGameDataReader(object):
     @staticmethod
+    def GetDataPathFileByName(fileName):
+        return os.path.join(os.path.dirname(__file__), "data-files", fileName)
+
+    @staticmethod
     def GetGroupData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files", "GroupData.csv"),
+            CardGameDataReader.GetDataPathFileByName("GroupData.csv"),
             "group"
         )
 
@@ -16,7 +20,7 @@ class CardGameDataReader(object):
     @staticmethod
     def GetGuessData():
         r = CardGameDataReader(
-            os.path.join(os.path.dirname(__file__), "data-files", "GuessData.csv"),
+            CardGameDataReader.GetDataPathFileByName("GuessData.csv"),
             "guess"
         )
 
@@ -40,33 +44,30 @@ class CardGameDataReader(object):
             c = 0
             for row in reader:
                 # dont move foward if the row is in the 3 start rows
+                if(len(row) == 0):
+                            continue # looks like a blank line
                 if(c >= 3):
                     try:
-                        # Make sure there is data to read
-                        if(row[2] == ""):
-                            # if the third item is blank, the completed data
-                            # is done, return the data set.
-                            return data
-                        else:
-                            # read the data into a grouping
-                            group = CardGameGrouping(
-                                row[1],
-                                row[2],
-                                row[3],
-                                row[56],
-                                row[57],
-                                row[58],
-                                row[59],
-                                bool(row[60]),
-                                bool(row[61]),
-                                bool(row[62]),
-                                bool(row[63]),
-                                bool(row[64]),
-                                row[4:55]                               
-                            )
-                            # add the grouping to the final data set
-                            data.append(group)
-                    except csv.Error as e:
+                        # read the data into a grouping
+                        group = CardGameGrouping(
+                            int(row[0]),
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[56],
+                            row[57],
+                            row[58],
+                            row[59],
+                            row[60],
+                            row[61],
+                            row[62],
+                            row[63],
+                            row[64],
+                            row[4:56]                      
+                        )
+                        # add the grouping to the final data set
+                        data.append(group)
+                    except Exception as e:
                         # skip this line, we had an error
                         print(e)
                         c += 1
