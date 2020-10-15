@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from .card_game_grouping import CardGameGrouping
 from .card_guess import CardGuess
-from . import data_updater as du
 
 class CardGameDataReader(object):
     @staticmethod
@@ -52,7 +51,30 @@ class CardGameDataReader(object):
                 writer = csv.writer(fs, delimiter=",", quotechar='|')
                 for row in tempD:
                     writer.writerow(row.split(','))
-            du.write_new_group(CardGameGrouping(gameId=1)) # write an empty first game
+                # write an empty first game
+                group = CardGameGrouping(gameId=1)
+                data = [
+                    group.game_id,
+                    group.start_date,
+                    group.end_date,
+                    group.total_days,
+                ]
+                
+                data.extend(group.card_counts)
+
+                data.extend([
+                    group.unique_attempts,
+                    group.total_attempts,
+                    group.repeated_guesses,
+                    group.winner,
+                    group.first_guess,
+                    group.two_row,
+                    group.three_row,
+                    group.four_row,
+                    group.last_card
+                ])
+
+                writer.writerow(data)
 
 
         with open(self.fileName, newline='') as csvfile:
