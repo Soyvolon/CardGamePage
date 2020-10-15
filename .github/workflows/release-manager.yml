@@ -1,0 +1,86 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Manager
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - release/*
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    runs-on: ubunut-latest 
+    
+    steps:
+      # download and publish the cards-artifact
+      - name: Download Cards Build Artifact
+        uses: actions/download-artifact@v2.0.5
+        with:
+          # Artifact name
+          name: cards-artifact # optional
+          # Destination path
+          #path:  # optional
+      - name: SCP Command to Transfer Files
+        # You may pin to the exact commit or the version.
+        # uses: appleboy/scp-action@edc8ec9139a2687bcebf0249d0352ff2a988df00
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          # scp remote host
+          host: andrewbounds.com # optional
+          # scp remote port
+          #port: # optional, default is 22
+          # scp username
+          username: ${{ secrets.SSH_USER }} # optional
+          # scp password
+          #password: # optional
+          # timeout for ssh to remote host
+          #timeout: # optional, default is 30s
+          # timeout for scp command
+          #command_timeout: # optional, default is 10m
+          # content of ssh private key. ex raw content of ~/.ssh/id_rsa
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+          # path of ssh private key
+          #key_path: # optional
+          # ssh key passphrase
+          passphrase: ${{ secrets.SSH_KEY_PASS }} # optional
+          # fingerprint SHA256 of the host public key, default is to skip verification
+          #fingerprint: # optional
+          # include more ciphers with use_insecure_cipher
+          #use_insecure_cipher: # optional
+          # target path on the server
+          target: /var/www/andrewbounds # optional
+          # scp file list
+          #source: # optional
+          # remove target folder before upload data
+          #rm: # optional
+          # enable debug message
+          #debug: # optional
+          # remove the specified number of leading path elements
+          #strip_components: # optional, default is 0
+          # use `--overwrite` flag with tar
+          #overwrite: # optional
+          # temporary path for tar file on the dest host
+          #tar_tmp_path: # optional
+          # ssh proxy remote host
+          #proxy_host: # optional
+          # ssh proxy remote port
+          #proxy_port: # optional, default is 22
+          # ssh proxy username
+          #proxy_username: # optional
+          # ssh proxy password
+          #proxy_password: # optional
+          # ssh proxy key passphrase
+          #proxy_passphrase: # optional
+          # timeout for ssh to proxy host
+          #proxy_timeout: # optional, default is 30s
+          # content of ssh proxy private key. ex raw content of ~/.ssh/id_rsa
+          #proxy_key: # optional
+          # path of ssh proxy private key
+          #proxy_key_path: # optional
+          # fingerprint SHA256 of the host public key, default is to skip verification
+          #proxy_fingerprint: # optional
+          # include more ciphers with use_insecure_cipher
+          #proxy_use_insecure_cipher: # optional
