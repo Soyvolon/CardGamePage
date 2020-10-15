@@ -29,42 +29,23 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Copy via ssh
+    - name: SCP Files
       # You may pin to the exact commit or the version.
-      # uses: garygrossgarten/github-action-scp@0c1ad091481702528d20a02000b6248da6c5f8fb
-      uses: garygrossgarten/github-action-scp@v0.6.0
+      # uses: appleboy/scp-action@b476d5806f2a4c1ed5902a87fa91b0623cac7258
+      uses: appleboy/scp-action@v0.0.1
       with:
-        # Path to the local folder you want to copy.
-        local: /*
-        # Path on the remote server to copy to.
-        remote: /var/www/andrewbounds/
-        # Number of concurrent file transfers.
-        #concurrency: # optional, default is 1
-        # Wether copy of directory should be recursive
-        #recursive: # optional, default is true
-        # Log status of every file copy
-        #verbose: # optional, default is true
-        # Hostname or IP address of the server.
-        host: andrewbounds.com # optional, default is localhost
-        # Username for authentication.
-        username: ${{ secrets.SSH_USER }} # optional
-        # Port number of the server.
-        #port: # optional, default is 22
-        # File Location or string that contains a private key for either key-based or hostbased user authentication (OpenSSH format)
-        privateKey: ${{ secrets.SSH_PRIVATE_KEY }} # optional
-        # Password for password-based user authentication.
-        #password: # optional
-        # For an encrypted private key, this is the passphrase used to decrypt it.
-        passphrase: ${{ secrets.SSH_KEY_PASS }} # optional
-        # Try keyboard-interactive user authentication if primary user authentication method fails.
-        #tryKeyboard: # optional
+        host: andrewbounds.com
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        target: /var/www/andrewgounds/
+        source: /*
     - name: SSH Remote Commands
       # You may pin to the exact commit or the version.
       # uses: appleboy/ssh-action@bf84735fa9986d048980965656d55112e863f432
       uses: appleboy/ssh-action@v0.1.3
       with:
         # ssh host
-        host: andrewbounds.com# optional
+        host: andrewbounds.com # optional
         # ssh port
         #port: # optional, default is 22
         # ssh key passphrase
