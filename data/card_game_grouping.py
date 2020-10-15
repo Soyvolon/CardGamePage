@@ -3,7 +3,7 @@ class CardGameGrouping(object):
         uniqueAttempts = 0, totalAttempts = 0, repeatedGuesses = 0, 
         winner = 0, 
         firstGuess = "", twoRow = "", threeRow = "", 
-        fourRow = "", lastCard = "", cardCounts = [0] * 52):
+        fourRow = "", lastCard = "", cardCounts = ['0'] * 52):
         self.game_id = gameId
         self.start_date = startDate
         self.end_date = endDate
