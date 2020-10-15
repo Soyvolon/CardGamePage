@@ -7,7 +7,7 @@ class Test_TestComplieGroupGraphs(unittest.TestCase):
     def setUp(self):
         # register the data variable
         try:
-            filePath = os.path.join(os.path.dirname(__file__), "test_data\\GroupTestData.csv")
+            filePath = os.path.join(os.path.dirname(__file__), "test_data", "GroupTestData.csv")
             reader = Reader(
                 filePath,
                 "group" 
