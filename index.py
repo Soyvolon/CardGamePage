@@ -44,7 +44,7 @@ def display_page(pathname):
     elif(pathname == '/details'):
         return Details()
     else:
-        return Homepage(guessdata)
+        return Homepage(guessdata, groupdata)
 
 # END Callbacks ----------------------
 # API Routing ------------------------
