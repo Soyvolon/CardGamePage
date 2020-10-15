@@ -142,6 +142,22 @@ def update_guess_handler():
             return Response(status=401)
     except Exception:
         return Response(status=400)
+
+@server.route("/api/v1/game/guess/delete", methods=["POST"])
+def delete_guess_handler():
+    try:
+        if(request.headers['Authorization'] in AuthroizedUsers()):
+            json = request.json
+            if du.delete_single_guess(json, guessdata, groupdata):
+                cache_data()
+                return Response(status=200)
+            else:
+                return Response(status=400)
+        else:
+            return Response(status=401)
+    except Exception:
+        return Response(status=400)
+    
 # END API Routing --------------------
 
 if __name__ == "__main__":
