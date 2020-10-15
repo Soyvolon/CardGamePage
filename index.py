@@ -96,6 +96,7 @@ def testauth_respond():
 
 @server.route('/api/v1/game/current', methods=["GET"])
 def get_current_game_respond():
+    decache_data()
     return jsonify(gr.get_current_game(guessdata, len(groupdata)))
 
 @server.route('/api/v1/game/guess', methods=["POST"])
@@ -103,6 +104,7 @@ def guess_respond():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
+            decache_data()
             if du.save_new_guesses(json, guessdata, groupdata):
                 cache_data() # save to active cache
                 return Response(status=200)
@@ -118,6 +120,7 @@ def victory_respond():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
+            decache_data()
             if du.update_victory(json, guessdata, groupdata):
                 cache_data() # save to active cache
                 return Response(status=200)
@@ -133,6 +136,7 @@ def update_guess_handler():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
+            decache_data()
             if du.update_single_guess(json, guessdata, groupdata):
                 cache_data()
                 return Response(status=200)
@@ -148,6 +152,7 @@ def delete_guess_handler():
     try:
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
+            decache_data()
             if du.delete_single_guess(json, guessdata, groupdata):
                 cache_data()
                 return Response(status=200)
