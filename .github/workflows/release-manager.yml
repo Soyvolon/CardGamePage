@@ -11,7 +11,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
+  deploy:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
@@ -30,46 +30,24 @@ jobs:
             flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
             flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        - name: Upload a Build Artifact
-          uses: actions/upload-artifact@v2.2.0
+        - name: SCP Command to Transfer Files
+          # You may pin to the exact commit or the version.
+          # uses: appleboy/scp-action@edc8ec9139a2687bcebf0249d0352ff2a988df00
+          uses: appleboy/scp-action@v0.1.1
           with:
-            # Artifact name
-            name: cards-artifact # optional, default is artifact
-            # A file, directory or wildcard pattern that describes what to upload
-            path: ./*
-            # The desired behavior if no files are found using the provided path.
-            if-no-files-found: error
-            retention-days: 7
-  deploy:
-    runs-on: ubuntu-latest 
-    
-    steps:
-      # download and publish the cards-artifact
-      - name: Download Cards Build Artifact
-        uses: actions/download-artifact@v2.0.5
-        with:
-          # Artifact name
-          name: cards-artifact # optional
-          # Destination path
-          #path:  # optional
-      - name: SCP Command to Transfer Files
-        # You may pin to the exact commit or the version.
-        # uses: appleboy/scp-action@edc8ec9139a2687bcebf0249d0352ff2a988df00
-        uses: appleboy/scp-action@v0.1.1
-        with:
-          # scp remote host
-          host: andrewbounds.com # optional
-          # scp remote port
-          #port: # optional, default is 22
-          # scp username
-          username: ${{ secrets.SSH_USER }} # optional
-          # content of ssh private key. ex raw content of ~/.ssh/id_rsa
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
-          # path of ssh private key
-          #key_path: # optional
-          # ssh key passphrase
-          passphrase: ${{ secrets.SSH_KEY_PASS }} # optional
-          # target path on the server
-          target: /var/www/andrewbounds # optional
-          # scp file list
-          #source: # optional
+            # scp remote host
+            host: andrewbounds.com # optional
+            # scp remote port
+            #port: # optional, default is 22
+            # scp username
+            username: ${{ secrets.SSH_USER }} # optional
+            # content of ssh private key. ex raw content of ~/.ssh/id_rsa
+            key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+            # path of ssh private key
+            #key_path: # optional
+            # ssh key passphrase
+            passphrase: ${{ secrets.SSH_KEY_PASS }} # optional
+            # target path on the server
+            target: /var/www/andrewbounds # optional
+            # scp file list
+            #source: # optional
