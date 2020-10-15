@@ -47,14 +47,14 @@ jobs:
         # Hostname or IP address of the server.
         host: andrewbounds.com # optional, default is localhost
         # Username for authentication.
-        username: ${{ SSH_USER }} # optional
+        username: ${{ secrets.SSH_USER }} # optional
         # Port number of the server.
         #port: # optional, default is 22
         # File Location or string that contains a private key for either key-based or hostbased user authentication (OpenSSH format)
-        privateKey: ${{ SSH_PRIVATE_KEY }} # optional
+        privateKey: ${{ secrets.SSH_PRIVATE_KEY }} # optional
         # Password for password-based user authentication.
         #password: # optional
         # For an encrypted private key, this is the passphrase used to decrypt it.
-        passphrase: ${{ SSH_KEY_PASS }} # optional
+        passphrase: ${{ secrets.SSH_KEY_PASS }} # optional
         # Try keyboard-interactive user authentication if primary user authentication method fails.
         #tryKeyboard: # optional
