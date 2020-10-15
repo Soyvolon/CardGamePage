@@ -282,3 +282,139 @@ def write_new_group(group):
         ])
 
         writer.writerow(data)
+
+def update_single_guess(update_info, guessdata, groupdata):
+    try:
+        if(update_info['new']['game'] != update_info['old']['game']):
+            return False # Can't change the game of an editied guess!
+        else:
+            game = update_info['new']['game']
+
+        # the group will not be chaning durring live data reuqests
+        c_group =  next((x for x in groupdata if x.game_id == game), None)
+        if c_group == None or c_group.game_id != len(groupdata):
+            return False # don't allow updates unless
+                # its for the latest game!
+
+        inverted_guesses = guessdata[::-1]
+        guesses_for_group = [x for x in inverted_guesses if x.game_id == game]
+        c_guess = next((x for x in guesses_for_group if 
+            x.card == update_info['old']['card']
+            and x.user_id == update_info['old']['user_id']
+            and x.date == update_info['old']['date']), None)
+
+        if(c_guess == None):
+            return False # can't edit something that does not exsist!
+
+        guess_index = guesses_for_group.index(c_guess)
+
+        update = CardGuess(
+            game,
+            team = update_info['new']['team'],
+            card = update_info['new']['card'],
+            date = update_info['new']['date'],
+            time = update_info['new']['time'],
+            user_id = update_info['new']['user_id']
+        )
+
+        # remove the old guess from the group
+        remove_guess_from_group(c_guess, c_group)
+
+        # replace card data
+        c_guess.user_id = update.user_id
+        c_guess.team = update.team
+        c_guess.card = update.card
+        c_guess.date = update.date
+        c_guess.time = update.time
+
+        # update the group data
+        if(guess_index == 0): # first guess, update start date
+            c_group.start_date = c_guess.date
+
+        g = c_group.card_counts[guess_converter[c_guess.card]]
+        if(g == 'Y'):
+            return False # game is already completed!
+        else:
+            new_num = int(g) + 1
+            c_group.card_counts[guess_converter[c_guess.card]] = str(new_num)
+
+        write_update_group(c_group)
+        write_update_guess(update_info['old'], c_guess)
+
+        return True
+    except Exception:
+        return False
+
+def write_update_guess(guess, new_data):
+    path = DataReader.GetDataPathFileByName('GuessData.csv')
+    fh, abs_path = mkstemp()
+    with fdopen(fh, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file, delimiter=',', quotechar='|')
+        with open(path) as old_file:
+            reader = csv.reader(old_file, delimiter=',', quotechar='|')
+            for row in reader:
+                if(len(row) == 0):
+                    continue
+                if(row[2] == guess['user_id'] and
+                    row[3] == guess['card'] and
+                    row[4] == guess['date']):
+
+                    # write the edited data
+                    writer.writerow([
+                        "", # game col, dont write anything to this.
+                        new_data.team,
+                        new_data.user_id,
+                        new_data.card,
+                        new_data.date,
+                        new_data.time
+                    ])
+                else:
+                    writer.writerow(row)
+    copymode(path, abs_path)
+    remove(path)
+    move(abs_path, path)
+
+def delete_single_guess(guess_json, guessdata, groupdata):
+        game = guess_json['game_id']
+
+        # the group will not be chaning durring live data reuqests
+        c_group =  next((x for x in groupdata if x.game_id == game), None)
+        if c_group == None or c_group.game_id != len(groupdata):
+            return False # don't allow updates unless
+                # its for the latest game!
+
+        inverted_guesses = guessdata[::-1]
+        guesses_for_group = [x for x in inverted_guesses if x.game_id == game]
+        c_guess = next((x for x in guesses_for_group if 
+            x.card == guess_json['card']
+            and x.user_id == guess_json['user_id']
+            and x.date == guess_json['date']), None)
+
+        remove_guess_from_group(c_guess, c_group)
+        guessdata.remove(c_guess)
+
+        write_update_group(c_group)
+        write_delete_guess(guess_json)
+
+        return True
+        
+def write_delete_guess(guess):
+    path = DataReader.GetDataPathFileByName('GuessData.csv')
+    fh, abs_path = mkstemp()
+    with fdopen(fh, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file, delimiter=',', quotechar='|')
+        with open(path) as old_file:
+            reader = csv.reader(old_file, delimiter=',', quotechar='|')
+            for row in reader:
+                if(len(row) == 0):
+                    continue
+                if(row[2] == guess['user_id'] and
+                    row[3] == guess['card'] and
+                    row[4] == guess['date']):
+                    # we are skipping this line - aka deleting it!
+                        pass
+                else:
+                    writer.writerow(row)
+    copymode(path, abs_path)
+    remove(path)
+    move(abs_path, path)
