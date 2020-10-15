@@ -32,13 +32,13 @@ jobs:
     - name: SCP Files
       # You may pin to the exact commit or the version.
       # uses: appleboy/scp-action@b476d5806f2a4c1ed5902a87fa91b0623cac7258
-      uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@v0.1.1
       with:
         host: andrewbounds.com
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        target: /var/www/andrewgounds/
-        source: /*
+        target: var/www/andrewgounds/
+        source: CardGamePage/*
     - name: SSH Remote Commands
       # You may pin to the exact commit or the version.
       # uses: appleboy/ssh-action@bf84735fa9986d048980965656d55112e863f432
