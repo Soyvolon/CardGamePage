@@ -10,8 +10,9 @@ from pages.card_guess_data_page import GuessData
 from pages.shared.layout import Layout
 from pages.card_game_details import Details
 
-from flask import request, Response
+from flask import request, Response, jsonify
 from api.auth import AuthroizedUsers
+from api import game_responder as gr
 from data import data_updater as du
 
 from data.card_game_data_reader import CardGameDataReader as DataReader
@@ -47,10 +48,6 @@ def display_page(pathname):
 
 # END Callbacks ----------------------
 # API Routing ------------------------
-@server.route('/api/v1/game/current', methods=["GET"])
-def get_current_game_respond():
-    return Response(200)
-
 @server.route('/api/v1/testauth', methods=["POST"])
 def testauth_respond():
     try:
@@ -60,6 +57,10 @@ def testauth_respond():
             return Response(status=401)
     except Exception:
         return Response(status=400)
+
+@server.route('/api/v1/game/current', methods=["GET"])
+def get_current_game_respond():
+    return jsonify(gr.get_current_game(guessdata, len(groupdata)))
 
 @server.route('/api/v1/game/guess', methods=["POST"])
 def guess_respond():

@@ -38,13 +38,18 @@ def update_live_data(new_guesses, guessdata, groupdata):
     guessdata.extend(new_guesses)
     # the group will not be chaning durring live data reuqests
     c_group =  next((x for x in groupdata if x.game_id == new_guesses[0].game_id), None)
-    if c_group.game_id != len(groupdata):
+    if c_group == None or c_group.game_id != len(groupdata):
         return False # don't allow updates unless
             # its for the latest game!
+    # get the guesses so far
+    guesses = sum([int(x) for x in c_group.card_counts if x != "0" and x != "Y"])
     for guess in new_guesses:
-        if(c_group == None or guess.game_id != c_group.game_id):
+        if(guess.game_id != c_group.game_id):
             return False
         else:
+            if(guesses == 0): # first guess? Update start date.
+                c_group.start_date = guess.date
+
             # update the group data
             g = c_group.card_counts[guess_converter[guess.card]]
             if(g == 'Y'):
@@ -54,7 +59,7 @@ def update_live_data(new_guesses, guessdata, groupdata):
                 c_group.card_counts[guess_converter[guess.card]] = str(new_num)
             
             update_attempts(c_group)
-    
+
     write_update_group(c_group)
     write_new_guesses(new_guesses)
     return True
@@ -63,6 +68,7 @@ def update_attempts(group):
     card_counts = [int(x) for x in group.card_counts if x != "0" and x != "Y"]
     if("Y" in group.card_counts):
         card_counts.append(1)
+
     group.unique_attempts = len(card_counts)
     group.total_attempts = sum(card_counts)
     group.repeated_guesses = group.total_attempts - group.unique_attempts
@@ -128,26 +134,151 @@ def write_new_guesses(new_guesses):
 def update_victory(json_data, guessdata, groupdata):
     # assume the json is correct
     try:
+        last_game = len(groupdata)
+        if(json_data['game_id'] != last_game):
+            return False # cant update the victory if its
+            # not the last game
         
-        return False
+        # the group will not be chaning durring live data reuqests
+        c_group =  next((x for x in groupdata if x.game_id == last_game), None)
+        if c_group == None or c_group.game_id != last_game:
+            return False # don't allow updates unless
+                # its for the latest game!
+
+        # find the winning guess object
+        guess_list = [x for x in guessdata if x.game_id == last_game]
+        guess = next((x for x in guess_list if x.user_id == json_data['user_id']
+            and x.card == json_data['card']
+            and x.date == json_data['date']), None)
+
+        if(guess == None):
+            return False # no matching guess found
+
+        # set the end date equal to the last guess
+        c_group.end_date = guess.date
+
+        # get the guesses after the winning guess
+        index = guessdata.index(guess)
+        to_remove = guessdata[index + 1:]
+        # remove any guesses after the winning guess
+        for i in to_remove:
+            try:
+                remove_guess_from_group(i, c_group)
+                guessdata.remove(i)
+            except ValueError:
+                pass
+        # assign the winning card id
+        c_group.card_counts[guess_converter[guess.card]] = 'Y'
+        update_attempts(c_group) # update attempts data
+
+        c_group.winner = guess.user_id
+        add_winner_flags(c_group, groupdata)
+
+        # write a new game to the GuessData
+        write_new_game(last_game + 1, guess)
+
+        # update the last game group
+        write_update_group(c_group)
+
+        # create a new game group
+        new_group = GameGroup(gameId=last_game + 1)
+        groupdata.append(new_group)
+
+        # write the new game group
+        write_new_group(new_group)
+
+        return True
     except Exception:
         return False
 
+def add_winner_flags(group, groupdata):
+    index = groupdata.index(group)
+    card_counts = [int(x) for x in group.card_counts if x != "0" and x != "Y"]
+    if("Y" in group.card_counts):
+        card_counts.append(1)
+    guess_count = sum(card_counts)
+    unique_guess = len(card_counts)
+
+    if(guess_count == 1):
+        group.first_guess = 'X'
+
+    if((index-1) > -1 and groupdata[index-1].winner == group.winner):
+        if((index-2) > -1 and groupdata[index-2].winner == group.winner):
+            if((index-3) > -1 and groupdata[index-3].winner == group.winner):
+                group.four_row = 'X'
+            else:
+                group.three_row = 'X'
+        else:
+            group.two_row = 'X'
+
+    if(unique_guess == 52):
+        group.last_card = 'X'
+
+
 def remove_guess_from_group(guess, group):
-    return False
+    # update the group data
+    g = group.card_counts[guess_converter[guess.card]]
+    if(g == 'Y'):
+        group.card_counts[guess_converter[guess.card]] = str(0)
+    else:
+        new_num = int(g) - 1
+        if new_num < 0: new_num = 0
+        group.card_counts[guess_converter[guess.card]] = str(new_num)
 
-def write_new_game(game_id, last_guess):
+
+def write_new_game(new_game_id, last_guess):
     path = DataReader.GetDataPathFileByName('GuessData.csv')
+    fh, abs_path = mkstemp()
+    with fdopen(fh, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file, delimiter=',', quotechar='|')
+        with open(path) as old_file:
+            reader = csv.reader(old_file, delimiter=',', quotechar='|')
+            for row in reader:
+                if(len(row) == 0):
+                    continue
+                if(row[2] == last_guess.user_id and
+                    row[3] == last_guess.card and
+                    row[4] == last_guess.date):
+
+                    # write this row
+                    writer.writerow(row)
+                    # write the new game row
+                    writer.writerow([
+                        new_game_id, # next game id
+                        "", "", "", "", "" # blank row
+                    ])
+                    # break the loop, we are done editing
+                    break
+                else:
+                    writer.writerow(row)
+    copymode(path, abs_path)
+    remove(path)
+    move(abs_path, path)
+
+def write_new_group(group):
+    path = DataReader.GetDataPathFileByName('GroupData.csv')
     with open(path, 'a', newline='') as fs:
-
-
-
-        # write the new game row
         writer = csv.writer(fs, delimiter=',', quotechar='|')
-        writer.writerow([
-            game_id, # next game id
-            "", "", "", "", "" # blank row
+
+        data = [
+            group.game_id,
+            group.start_date,
+            group.end_date,
+            group.total_days,
+        ]
+        
+        data.extend(group.card_counts)
+
+        data.extend([
+            group.unique_attempts,
+            group.total_attempts,
+            group.repeated_guesses,
+            group.winner,
+            group.first_guess,
+            group.two_row,
+            group.three_row,
+            group.four_row,
+            group.last_card
         ])
 
-def write_new_group(new_group):
-    return False
+        writer.writerow(data)
