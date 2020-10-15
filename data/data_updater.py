@@ -65,7 +65,7 @@ def update_live_data(new_guesses, guessdata, groupdata):
     return True
 
 def update_attempts(group):
-    card_counts = [int(x) for x in group.card_counts if x != "0" and x != "Y"]
+    card_counts = [int(x) for x in group.card_counts if not (x == "0" or x == 0) and x != "Y"]
     if("Y" in group.card_counts):
         card_counts.append(1)
 
