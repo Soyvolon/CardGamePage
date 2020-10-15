@@ -16,11 +16,45 @@ from api import game_responder as gr
 from data import data_updater as du
 
 from data.card_game_data_reader import CardGameDataReader as DataReader
+from data import json_converter as jc
+
+import redis
 
 # END IMPORTS ----------------------------
+# Utils ------------------------------
+def cache_data():
+    gr_json = jc.get_data_json(groupdata)
+    gu_json = jc.get_data_json(guessdata)
+
+    r.set('groupdata', gr_json)
+    r.set('guessdata', gu_json)
+
+def decache_data():
+    gr_json = r.get('groupdata')
+    gu_json = r.get('guessdata')
+    # update the global data
+    global groupdata
+    global guessdata 
+    if(gr_json == None):
+        groupdata = DataReader.GetGroupData()
+    else:
+        groupdata = jc.get_group_list(gr_json)
+
+    if(gu_json == None):
+        guessdata = DataReader.GetGuessData()
+    else:
+        guessdata = jc.get_guess_list(gu_json)
+#END Utils ---------------------------
+
+r = redis.Redis(
+    host='localhost',
+    port=6379
+)
 
 groupdata = DataReader.GetGroupData()
 guessdata = DataReader.GetGuessData()
+
+cache_data()
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
@@ -37,6 +71,8 @@ server = app.server
 @app.callback(Output('page-content', 'children'),
             [Input('url', 'pathname')])
 def display_page(pathname):
+    decache_data()
+
     if(pathname == '/cgroup'):
         return GroupData(groupdata)
     elif(pathname == '/cguess'):
@@ -68,6 +104,7 @@ def guess_respond():
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
             if du.save_new_guesses(json, guessdata, groupdata):
+                cache_data() # save to active cache
                 return Response(status=200)
             else:
                 return Response(status=400)
@@ -82,6 +119,7 @@ def victory_respond():
         if(request.headers['Authorization'] in AuthroizedUsers()):
             json = request.json
             if du.update_victory(json, guessdata, groupdata):
+                cache_data() # save to active cache
                 return Response(status=200)
             else:
                 return Response(status=400)
