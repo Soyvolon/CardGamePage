@@ -1,8 +1,9 @@
-def table_css():
-    return [{ # override default css for selected/focused table cells
-                'selector': 'td.cell--selected, td.focused',
-                'rule': 'background-color: #FF4136;'
-            }, {
-                'selector': 'td.cell--selected *, td.focused *',
-                'rule': 'color: #3C3C3C !important;'
-            }]
+def header():
+    return { 'backgroundColor': 'rgb(30, 30, 30)' }
+
+def cell():
+    return {
+            'textAlign': 'center',
+            'backgroundColor': 'rgb(50, 50, 50)',
+            'color': 'white'  
+        }

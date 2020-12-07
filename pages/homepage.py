@@ -11,14 +11,14 @@ def body(guessdata, groupdata):
         dbc.Row([
             dbc.Col(
                 html.Center([
-                    html.H2("Data Corner"),
+                    html.H2("The Card Game Data"),
                     html.P(
                         """\
 Supporting statistics from the legendary Card Game!
 """
                         ),
-                        dbc.Button("View details", color="secondary",
-                            href="/details"),
+                        dbc.Button("About", color="secondary",
+                            href="/about"),
                 ]),
             ),
             dbc.Col(html.Center([

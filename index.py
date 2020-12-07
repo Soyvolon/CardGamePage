@@ -8,7 +8,7 @@ from pages.homepage import Homepage
 from pages.card_group_data_page import GroupData
 from pages.card_guess_data_page import GuessData
 from pages.shared.layout import Layout
-from pages.card_game_details import Details
+from pages.card_game_details import About
 
 from flask import request, Response, jsonify
 from api.auth import AuthroizedUsers
@@ -59,6 +59,7 @@ cache_data()
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
 app.config.suppress_callback_exceptions = True
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh = False),
     Layout(html.Div(id = 'page-content')),
@@ -77,8 +78,8 @@ def display_page(pathname):
         return GroupData(groupdata)
     elif(pathname == '/cguess'):
         return GuessData(guessdata)
-    elif(pathname == '/details'):
-        return Details()
+    elif(pathname == '/about'):
+        return About()
     else:
         return Homepage(guessdata, groupdata)
 
