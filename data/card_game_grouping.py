@@ -18,3 +18,21 @@ class CardGameGrouping(object):
         self.four_row = fourRow
         self.last_card = lastCard
         self.card_counts = cardCounts
+
+    def get_data_dict(self):
+        return {
+            "game_id": self.game_id,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "total_days": self.total_days,
+            "unique_attempts": self.unique_attempts,
+            "total_attempts": self.total_attempts,
+            "repeated_guesses": self.repeated_guesses,
+            "winner": self.winner,
+            "first_guess": self.first_guess,
+            "two_row": self.two_row,
+            "three_row": self.three_row,
+            "four_row": self.four_row,
+            "last_card": self.last_card,
+            "card_counts": self.card_counts
+        }

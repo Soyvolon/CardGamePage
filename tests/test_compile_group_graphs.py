@@ -7,7 +7,7 @@ class Test_TestComplieGroupGraphs(unittest.TestCase):
     def setUp(self):
         # register the data variable
         try:
-            filePath = os.path.join(os.path.dirname(__file__), "test_data\\GroupTestData.csv")
+            filePath = os.path.join(os.path.dirname(__file__), "test_data", "GroupTestData.csv")
             reader = Reader(
                 filePath,
                 "group" 
@@ -22,7 +22,7 @@ class Test_TestComplieGroupGraphs(unittest.TestCase):
         print(self.data)
         self.assertTrue(True, msg="Data retrived")
 
-    def test_attempts_grpah(self):
+    def test_attempts_graph(self):
         try:
             fig = attempts.get_graph(self.data)
             fig.show()

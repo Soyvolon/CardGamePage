@@ -1,5 +1,6 @@
 import csv
 import os
+from pathlib import Path
 from .card_game_grouping import CardGameGrouping
 from .card_guess import CardGuess
 
@@ -38,6 +39,44 @@ class CardGameDataReader(object):
 
     def __read_group_data(self):
         data = []
+        if not os.path.exists(os.path.dirname(self.fileName)):
+            Path('./data/data-files').mkdir(parents=True, exist_ok=True)
+
+        if not os.path.exists(self.fileName):
+            # create an csv with the title cols
+            tempD = ["#,Start Date,End Date,Total Days,Clubs,,,,,,,,,,,,,Diamonds,,,,,,,,,,,,,Hearts,,,,,,,,,,,,,Spades,,,,,,,,,,,,,Unique Attempts,Total Attempts,Repeated Guesses,Winner,First Guess,Two In A Row,Three In A Row,Four In A Row,52nd Card",
+                ",,,,A,2,3,4,5,6,7,8,9,10,J,Q,K,A,2,3,4,5,6,7,8,9,10,J,Q,K,A,2,3,4,5,6,7,8,9,10,J,Q,K,A,2,3,4,5,6,7,8,9,10,J,Q,K,,,,,,,,,",
+                ",,,,AC,2C,3C,4C,5C,6C,7C,8C,9C,10C,JC,QC,KC,AD,2D,3D,4D,5D,6D,7D,8D,9D,10D,JD,QD,KD,AH,2H,3H,4H,5H,6H,7H,8H,9H,10H,JH,QH,KH,AS,2S,3S,4S,5S,6S,7S,8S,9S,10S,JS,QS,KS,,,,,,,,,"]
+            with open(self.fileName, "w+", newline='') as fs:
+                writer = csv.writer(fs, delimiter=",", quotechar='|')
+                for row in tempD:
+                    writer.writerow(row.split(','))
+                # write an empty first game
+                group = CardGameGrouping(gameId=1)
+                data = [
+                    group.game_id,
+                    group.start_date,
+                    group.end_date,
+                    group.total_days,
+                ]
+                
+                data.extend(group.card_counts)
+
+                data.extend([
+                    group.unique_attempts,
+                    group.total_attempts,
+                    group.repeated_guesses,
+                    group.winner,
+                    group.first_guess,
+                    group.two_row,
+                    group.three_row,
+                    group.four_row,
+                    group.last_card
+                ])
+
+                writer.writerow(data)
+
+
         with open(self.fileName, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 
@@ -80,6 +119,18 @@ class CardGameDataReader(object):
 
     def __read_tree_data(self):
         data = []
+        if not os.path.exists(os.path.dirname(self.fileName)):
+            Path('./data/data-files').mkdir(parents=True, exist_ok=True)
+
+        if not os.path.exists(self.fileName):
+            tempD = ["Game,Team,User,Card,Date,Time",
+                    '#,P - D - R - C - U - W - E - N - n/a,User ID,"A, 2-10, J, Q, K + C/D/H/S",Date the Guess was Made,Time the Guess was Made',
+                    '1,,,,,']
+            with open(self.fileName, "w+", newline='') as fs:
+                writer = csv.writer(fs, delimiter=",", quotechar='|')
+                for row in tempD:
+                    writer.writerow(row.split(','))
+
         with open(self.fileName, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=",", quotechar='|')
 

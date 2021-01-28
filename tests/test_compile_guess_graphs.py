@@ -2,13 +2,12 @@ import os
 import unittest
 from data.card_game_data_reader import CardGameDataReader as Reader
 from graphs.guess import team_count, current_game
-import dash
 
 class Test_TestComplieGroupGraphs(unittest.TestCase):
     def setUp(self):
         # register the data variable
         try:
-            filePath = os.path.join(os.path.dirname(__file__), "test_data\\GuessTestData.csv")
+            filePath = os.path.join(os.path.dirname(__file__), "test_data", "GuessTestData.csv")
             reader = Reader(
                 filePath,
                 "guess" 
