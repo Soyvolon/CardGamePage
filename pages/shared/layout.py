@@ -6,5 +6,5 @@ def Layout(content):
     return html.Div([
         nav.Navbar(),
         content,
-        foot.Footer()
+        #foot.Footer()
     ])
