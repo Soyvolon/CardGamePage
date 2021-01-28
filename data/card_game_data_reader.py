@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from .card_game_grouping import CardGameGrouping
 from .card_guess import CardGuess
+import pandas as pd
 
 class CardGameDataReader(object):
     @staticmethod
@@ -27,6 +28,10 @@ class CardGameDataReader(object):
 
         return r.read_data()
 
+    @staticmethod
+    def GetDataPath(fileType = "GroupData.csv"):
+        return os.path.join(os.path.dirname(__file__), "data-files", fileType)
+
     def __init__(self, fileName = "", fileType = ""):
         self.fileName = fileName
         self.fileType = fileType
@@ -36,7 +41,7 @@ class CardGameDataReader(object):
             return self.__read_group_data()
         elif(self.fileType == "guess"):
             return self.__read_tree_data()
-
+ 
     def __read_group_data(self):
         data = []
         if not os.path.exists(os.path.dirname(self.fileName)):
