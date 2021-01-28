@@ -116,20 +116,6 @@ def guess_respond():
     except Exception:
         return Response(status=400)
 
-@server.route('/api/v1/game/guess/delete', methods=["POST"])
-def guess_delete_respond():
-    try:
-        if(request.headers['Authroization'] in AuthroizedUsers()):
-            json = request.json
-            if du.delete_attempt(json, guessdata, groupdata):
-                return Response(status=200)
-            else:
-                return Response(status=400)
-        else:
-            return Response(status=400)
-    except Exception:
-        return Response(status=400)
-
 @server.route("/api/v1/game/victory", methods=["POST"])
 def victory_respond():
     try:
