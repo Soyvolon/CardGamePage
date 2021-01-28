@@ -13,7 +13,7 @@ from .card_game_data_reader import CardGameDataReader as DataReader
 guess_converter = { "AC":0, "2C":1, "3C":2, "4C":3, "5C":4, "6C":5, "7C":6, "8C":7, "9C":8, "10C":9, "JC":10, "QC":11, "KC":12, "AD":13, "2D":14, "3D":15, "4D":16, "5D":17, "6D":18, "7D":19, "8D":20, "9D":21, "10D":22, "JD":23, "QD":24, "KD":25, 
 "AH":26, "2H":27, "3H":28, "4H":29, "5H":30, "6H":31, "7H":32, "8H":33, "9H":34, "10H":35, "JH":36, "QH":37, "KH":38, "AS":39, "2S":40, "3S":41, "4S":42, "5S":43, "6S":44, "7S":45, "8S":46, "9S":47, "10S":48, "JS":49, "QS":50, "KS":51 }
 
-def save_new_guesses(json_data, guessdata, groupdata):
+def save_new_guesses(json_data, guessdata, groupdata) -> bool:
     try:
         # we are assuming the JSON is valid
         # and will return false if an error
@@ -31,6 +31,33 @@ def save_new_guesses(json_data, guessdata, groupdata):
             ))
 
         return update_live_data(new_guesses, guessdata, groupdata)
+    except Exception:
+        return False
+
+def delete_attempt(json_data, guessdata, groupdata) -> bool:
+    try:
+        guess = CardGuess(
+            game_id= json_data['game'],
+            user_id= json_data['user_id'],
+            team= json_data['team'],
+            card= json_data['card'],
+            date= json_data['date'],
+            time= json_data['time']
+        )
+
+        c_group =  next((x for x in groupdata if x.game_id == guess.game_id), None)
+        if c_group == None or c_group.game_id != len(groupdata):
+            return False # don't allow updates unless
+                # its for the latest game!
+
+        
+
+        remove_guess_from_group(guess, c_group)
+        del guessdata[guess]
+
+        write_update_group(c_group)
+
+
     except Exception:
         return False
 
@@ -131,6 +158,27 @@ def write_new_guesses(new_guesses):
                 line.time
             ])
 
+def write_remove_guess(to_remove):
+    path = DataReader.GetDataPathFileByName('GuessData.csv')
+    fh, abs_path = mkstemp()
+    with fdopen(fh, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file, delimiter=',', quotechar='|')
+        with open(path) as old_file:
+            reader = csv.reader(old_file, delimiter=',', quotechar='|')
+            for row in reader:
+                if(len(row) == 0):
+                    continue
+                if(row[2] == to_remove.user_id and
+                    row[3] == to_remove.card and
+                    row[4] == to_remove.date):
+                    continue # do nothing on the row we are deleting
+                else:
+                    writer.writerow(row)
+    copymode(path, abs_path)
+    remove(path)
+    move(abs_path, path)
+    
+
 def update_victory(json_data, guessdata, groupdata):
     # assume the json is correct
     try:
@@ -224,7 +272,6 @@ def remove_guess_from_group(guess, group):
         new_num = int(g) - 1
         if new_num < 0: new_num = 0
         group.card_counts[guess_converter[guess.card]] = str(new_num)
-
 
 def write_new_game(new_game_id, last_guess):
     path = DataReader.GetDataPathFileByName('GuessData.csv')
