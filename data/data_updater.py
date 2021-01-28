@@ -34,33 +34,6 @@ def save_new_guesses(json_data, guessdata, groupdata) -> bool:
     except Exception:
         return False
 
-def delete_attempt(json_data, guessdata, groupdata) -> bool:
-    try:
-        guess = CardGuess(
-            game_id= json_data['game'],
-            user_id= json_data['user_id'],
-            team= json_data['team'],
-            card= json_data['card'],
-            date= json_data['date'],
-            time= json_data['time']
-        )
-
-        c_group =  next((x for x in groupdata if x.game_id == guess.game_id), None)
-        if c_group == None or c_group.game_id != len(groupdata):
-            return False # don't allow updates unless
-                # its for the latest game!
-
-        
-
-        remove_guess_from_group(guess, c_group)
-        del guessdata[guess]
-
-        write_update_group(c_group)
-
-
-    except Exception:
-        return False
-
 def update_live_data(new_guesses, guessdata, groupdata):
     guessdata.extend(new_guesses)
     # the group will not be chaning durring live data reuqests
